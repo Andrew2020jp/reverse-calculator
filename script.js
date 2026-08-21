@@ -124,7 +124,7 @@
 
     const normalizeSide = (side) => {
       const candidates = side
-        .match(/[0-9?xX□()[\]+\-*/.%\s]+/g)
+        .match(/[0-9?xX□【】()[\]+\-*/.%\s]+/g)
         ?.map((candidate) => candidate.trim())
         .filter(Boolean)
         .sort((left, right) => right.length - left.length);
@@ -132,6 +132,7 @@
 
       return candidate
         .replace(/\[\s*\]/g, '□')
+        .replace(/【\s*】/g, '□')
         .replace(/[▢◻◼⬜☐]/g, '□')
         .replace(/[＋]/g, '+')
         .replace(/[−ー–—]/g, '-')
@@ -347,6 +348,7 @@
       .replace(/[−ー–—]/g, '-')
       .replace(/[×✕＊]/g, '*')
       .replace(/[÷／]/g, '/')
+      .replace(/【\s*】/g, '□')
       .replace(/[０-９]/g, (character) => String.fromCharCode(character.charCodeAt(0) - 0xff10 + 0x30))
       .replace(/[．]/g, '.')
       .replace(/\s+/g, '');
