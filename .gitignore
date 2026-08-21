@@ -1,0 +1,13 @@
+# Local browser/debug output
+debug.log
+
+# Editor and operating-system files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Dependencies and build output (if added later)
+node_modules/
+dist/
+
