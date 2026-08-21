@@ -678,6 +678,11 @@ button {
   font-weight: 700;
 }
 
+.keypad-key--unknown[data-key='【】'] {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 14px;
+}
+
 .keypad-key--equals {
   border-color: rgba(140, 240, 210, 0.28);
   color: var(--accent);
@@ -685,7 +690,7 @@ button {
 }
 
 .keypad-key--submit {
-  grid-column: span 2;
+  grid-column: 1 / -1;
   min-height: 44px;
   border-color: transparent;
   color: var(--accent-ink);
