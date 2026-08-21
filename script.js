@@ -20,6 +20,13 @@
   const historyList = document.querySelector('#history-list');
 
   const examples = document.querySelectorAll('.example-chip');
+  const isTouchDevice =
+    window.matchMedia?.('(pointer: coarse)').matches || Number(navigator.maxTouchPoints) > 0;
+
+  if (isTouchDevice) {
+    expressionInput.readOnly = true;
+    expressionInput.setAttribute('inputmode', 'none');
+  }
 
   function nearlyZero(value) {
     return Math.abs(value) < EPSILON;
@@ -534,14 +541,19 @@
     renderHistory();
   }
 
-  function updateInputValue(value, selectionStart, selectionEnd = selectionStart) {
+  function updateInputValue(
+    value,
+    selectionStart,
+    selectionEnd = selectionStart,
+    { focus = true } = {},
+  ) {
     expressionInput.value = value;
     expressionInput.setSelectionRange(selectionStart, selectionEnd);
     expressionInput.dispatchEvent(new Event('input', { bubbles: true }));
-    expressionInput.focus();
+    if (focus) expressionInput.focus();
   }
 
-  function insertKey(key) {
+  function insertKey(key, { focus = true } = {}) {
     if (answerStatus.classList.contains('is-success')) {
       expressionInput.value = '';
       setWaiting();
@@ -551,10 +563,10 @@
     const start = expressionInput.selectionStart ?? value.length;
     const end = expressionInput.selectionEnd ?? value.length;
     const nextValue = value.slice(0, start) + key + value.slice(end);
-    updateInputValue(nextValue, start + key.length);
+    updateInputValue(nextValue, start + key.length, start + key.length, { focus });
   }
 
-  function removeKey() {
+  function removeKey({ focus = true } = {}) {
     const value = expressionInput.value;
     let start = expressionInput.selectionStart ?? value.length;
     const end = expressionInput.selectionEnd ?? value.length;
@@ -562,7 +574,17 @@
     if (start === end && start > 0) start -= 1;
     if (start === end) return;
 
-    updateInputValue(value.slice(0, start) + value.slice(end), start);
+    updateInputValue(value.slice(0, start) + value.slice(end), start, start, { focus });
+  }
+
+  function clearExpression({ focus = true } = {}) {
+    expressionInput.value = '';
+    setWaiting();
+    if (focus) {
+      expressionInput.focus();
+    } else {
+      expressionInput.blur();
+    }
   }
 
   function readHistory() {
@@ -642,9 +664,7 @@
   });
 
   clearButton.addEventListener('click', () => {
-    expressionInput.value = '';
-    setWaiting();
-    expressionInput.focus();
+    clearExpression();
   });
 
   newExpressionButton.addEventListener('click', () => {
@@ -674,18 +694,23 @@
 
     const action = button.dataset.action;
     if (action === 'clear') {
-      clearButton.click();
+      clearExpression({ focus: false });
       return;
     }
     if (action === 'backspace') {
-      removeKey();
+      removeKey({ focus: false });
+      expressionInput.blur();
       return;
     }
     if (action === 'submit') {
+      expressionInput.blur();
       form.requestSubmit();
       return;
     }
-    if (button.dataset.key) insertKey(button.dataset.key);
+    if (button.dataset.key) {
+      insertKey(button.dataset.key, { focus: false });
+      expressionInput.blur();
+    }
   });
 
   document.addEventListener('keydown', (event) => {
