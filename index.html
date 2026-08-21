@@ -98,7 +98,7 @@
                 <button class="camera-stop" id="camera-stop" type="button">停止</button>
               </div>
               <p class="camera-help" id="camera-help">
-                式全体を明るく写してください。□・x・? のどれか1つを含む式に対応します。
+                式全体を明るく写してください。□・【】・x・? のどれか1つを含む式に対応します。
               </p>
             </section>
 
@@ -120,7 +120,7 @@
               <button class="clear-input-button" id="clear-button" type="button">全部削除</button>
               <p class="input-help" id="expression-help">
                 <span class="help-icon" aria-hidden="true">i</span>
-                □・x・? のどれか1つを、わからない数として使えます。スマホでは下のボタンで入力できます。20% は 0.2 として計算します。
+                □・【】・x・? のどれか1つを、わからない数として使えます。スマホでは下のボタンで入力できます。20% は 0.2 として計算します。
               </p>
               <p class="form-error" id="form-error" role="alert" aria-live="polite"></p>
 
@@ -156,6 +156,7 @@
                   <button class="keypad-key keypad-key--operator" type="button" data-key="+">＋</button>
 
                   <button class="keypad-key keypad-key--unknown" type="button" data-key="□">□</button>
+                  <button class="keypad-key keypad-key--unknown" type="button" data-key="【】">【】</button>
                   <button class="keypad-key keypad-key--operator keypad-key--equals" type="button" data-key="=">＝</button>
                   <button class="keypad-key keypad-key--submit" type="button" data-action="submit">計算する</button>
                 </div>
