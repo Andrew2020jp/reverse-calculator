@@ -390,6 +390,44 @@
     };
   }
 
+  function solveUnknownDenominator(leftExpression, rightExpression, normalized, original) {
+    const denominatorPattern = /\/(?:\(?[□?xX]\)?)$/;
+    if (!denominatorPattern.test(leftExpression)) return null;
+
+    const slashIndex = leftExpression.lastIndexOf('/');
+    const numeratorExpression = leftExpression.slice(0, slashIndex);
+    if (!numeratorExpression) return null;
+
+    const numerator = new ExpressionParser(numeratorExpression).parse();
+    const target = new ExpressionParser(rightExpression).parse();
+
+    if (!nearlyZero(numerator.coefficient) || !nearlyZero(target.coefficient)) {
+      return null;
+    }
+
+    if (nearlyZero(target.constant)) {
+      throw new Error('0になる割り算からは、□を1つに決められません。');
+    }
+
+    if (nearlyZero(numerator.constant)) {
+      throw new Error('この式を満たす□はありません。');
+    }
+
+    const value = numerator.constant / target.constant;
+    if (!Number.isFinite(value) || nearlyZero(value)) {
+      throw new Error('割る数を0にはできないため、この式の□は決まりません。');
+    }
+
+    return {
+      kind: 'division-with-unknown-denominator',
+      value,
+      normalized,
+      original: original.trim(),
+      numerator: numerator.constant,
+      target: target.constant,
+    };
+  }
+
   function solve(expression) {
     const normalized = normalizeExpression(expression);
     if (!normalized) {
@@ -400,6 +438,14 @@
     if (directDivision) return directDivision;
 
     const { left: leftExpression, right: rightExpression } = splitEquation(normalized);
+    const unknownDenominator = solveUnknownDenominator(
+      leftExpression,
+      rightExpression,
+      normalized,
+      expression,
+    );
+    if (unknownDenominator) return unknownDenominator;
+
     const left = new ExpressionParser(leftExpression).parse();
     const right = new ExpressionParser(rightExpression).parse();
 
@@ -439,7 +485,10 @@
     const decimalText = formatNumber(result.value);
     let stepData;
 
-    if (result.kind === 'direct-division') {
+    if (
+      result.kind === 'direct-division' ||
+      result.kind === 'division-with-unknown-denominator'
+    ) {
       const numeratorText = formatMathValue(result.numerator);
       const targetText = formatMathValue(result.target);
       stepData = [
