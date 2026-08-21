@@ -18,14 +18,234 @@
   const steps = document.querySelector('#steps');
   const stepsList = document.querySelector('#steps-list');
   const historyList = document.querySelector('#history-list');
+  const cameraButton = document.querySelector('#camera-button');
+  const cameraPanel = document.querySelector('#camera-panel');
+  const cameraCloseButton = document.querySelector('#camera-close');
+  const cameraVideo = document.querySelector('#camera-video');
+  const cameraCanvas = document.querySelector('#camera-canvas');
+  const cameraCaptureButton = document.querySelector('#camera-capture');
+  const cameraStopButton = document.querySelector('#camera-stop');
+  const cameraStatus = document.querySelector('#camera-status');
 
   const examples = document.querySelectorAll('.example-chip');
   const isTouchDevice =
     window.matchMedia?.('(pointer: coarse)').matches || Number(navigator.maxTouchPoints) > 0;
+  let cameraStream = null;
+  let cameraRequestId = 0;
+  let ocrLibraryPromise = null;
+  let ocrWorkerPromise = null;
+  let ocrWorker = null;
+  let cameraRecognitionInProgress = false;
 
   if (isTouchDevice) {
     expressionInput.readOnly = true;
     expressionInput.setAttribute('inputmode', 'none');
+  }
+
+  function setCameraStatus(message, isError = false) {
+    cameraStatus.textContent = message;
+    cameraStatus.classList.toggle('is-error', isError);
+  }
+
+  function stopCamera() {
+    cameraStream?.getTracks().forEach((track) => track.stop());
+    cameraStream = null;
+    cameraVideo.srcObject = null;
+    cameraCaptureButton.disabled = true;
+  }
+
+  function closeCamera() {
+    cameraRequestId += 1;
+    stopCamera();
+    cameraPanel.hidden = true;
+    cameraButton.setAttribute('aria-expanded', 'false');
+    cameraButton.disabled = false;
+  }
+
+  function loadOcrLibrary() {
+    if (window.Tesseract) return Promise.resolve(window.Tesseract);
+    if (ocrLibraryPromise) return ocrLibraryPromise;
+
+    ocrLibraryPromise = new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@6.0.1/dist/tesseract.min.js';
+      script.async = true;
+      script.onload = () => {
+        if (window.Tesseract) {
+          resolve(window.Tesseract);
+        } else {
+          reject(new Error('文字認識ライブラリを読み込めませんでした。'));
+        }
+      };
+      script.onerror = () => reject(new Error('文字認識ライブラリの読み込みに失敗しました。'));
+      document.head.append(script);
+    });
+
+    return ocrLibraryPromise;
+  }
+
+  async function getOcrWorker() {
+    if (ocrWorker) return ocrWorker;
+    if (!ocrWorkerPromise) {
+      ocrWorkerPromise = loadOcrLibrary()
+        .then((tesseract) =>
+          tesseract.createWorker('eng', 1, {
+            logger: (message) => {
+              if (message.status === 'recognizing text' && Number.isFinite(message.progress)) {
+                setCameraStatus(`文字を解析中… ${Math.round(message.progress * 100)}%`);
+              } else if (message.status) {
+                setCameraStatus('文字認識を準備中…');
+              }
+            },
+          }),
+        )
+        .then((worker) => {
+          ocrWorker = worker;
+          return worker;
+        });
+    }
+
+    try {
+      return await ocrWorkerPromise;
+    } catch (error) {
+      ocrWorkerPromise = null;
+      throw error;
+    }
+  }
+
+  function normalizeRecognizedExpression(rawText) {
+    const lines = rawText
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter(Boolean);
+    const source = lines.find((line) => /[=＝]/.test(line)) || rawText.replace(/\r?\n/g, ' ');
+    const equalIndex = source.search(/[=＝]/);
+    if (equalIndex < 0) return '';
+
+    const normalizeSide = (side) => {
+      const candidates = side
+        .match(/[0-9?xX□()[\]+\-*/.%\s]+/g)
+        ?.map((candidate) => candidate.trim())
+        .filter(Boolean)
+        .sort((left, right) => right.length - left.length);
+      const candidate = candidates?.[0] || side;
+
+      return candidate
+        .replace(/\[\s*\]/g, '□')
+        .replace(/[▢◻◼⬜☐]/g, '□')
+        .replace(/[＋]/g, '+')
+        .replace(/[−ー–—]/g, '-')
+        .replace(/[×✕＊]/g, '*')
+        .replace(/[÷／]/g, '/')
+        .replace(/[．]/g, '.')
+        .replace(/[^0-9?xX□().%+\-*/]/g, '');
+    };
+
+    const left = normalizeSide(source.slice(0, equalIndex));
+    const right = normalizeSide(source.slice(equalIndex + 1));
+    if (!left || !right || !/[□?xX]/.test(`${left}${right}`)) return '';
+
+    return `${left}=${right}`;
+  }
+
+  function captureCameraFrame() {
+    if (!cameraVideo.videoWidth || !cameraVideo.videoHeight) {
+      throw new Error('カメラの映像がまだ準備できていません。');
+    }
+
+    const maxWidth = 1600;
+    const scale = Math.min(1, maxWidth / cameraVideo.videoWidth);
+    cameraCanvas.width = Math.round(cameraVideo.videoWidth * scale);
+    cameraCanvas.height = Math.round(cameraVideo.videoHeight * scale);
+    const context = cameraCanvas.getContext('2d', { willReadFrequently: true });
+    if (!context) throw new Error('カメラ画像を処理できませんでした。');
+
+    context.filter = 'grayscale(1) contrast(1.2)';
+    context.drawImage(cameraVideo, 0, 0, cameraCanvas.width, cameraCanvas.height);
+    context.filter = 'none';
+    return cameraCanvas;
+  }
+
+  async function recognizeCameraExpression() {
+    if (cameraRecognitionInProgress) return;
+
+    cameraRecognitionInProgress = true;
+    cameraCaptureButton.disabled = true;
+    setCameraStatus('画像を準備中…');
+
+    try {
+      const frame = captureCameraFrame();
+      const worker = await getOcrWorker();
+      setCameraStatus('文字を解析中…');
+      const result = await worker.recognize(frame);
+      const expression = normalizeRecognizedExpression(result.data.text);
+
+      if (!expression) {
+        throw new Error('式を読み取れませんでした。□・x・? を含む式を枠内に写してください。');
+      }
+
+      expressionInput.value = expression;
+      expressionInput.dispatchEvent(new Event('input', { bubbles: true }));
+      form.requestSubmit();
+
+      if (answerStatus.classList.contains('is-success')) {
+        closeCamera();
+      } else {
+        setCameraStatus(`読み取った式「${displayExpression(expression)}」を確認してください。`, true);
+      }
+    } catch (error) {
+      setCameraStatus(
+        error instanceof Error ? error.message : 'カメラ画像を読み取れませんでした。',
+        true,
+      );
+    } finally {
+      cameraRecognitionInProgress = false;
+      if (!cameraPanel.hidden && cameraStream) cameraCaptureButton.disabled = false;
+    }
+  }
+
+  async function openCamera() {
+    const requestId = ++cameraRequestId;
+    cameraPanel.hidden = false;
+    cameraButton.setAttribute('aria-expanded', 'true');
+    cameraButton.disabled = true;
+    stopCamera();
+    setCameraStatus('カメラを起動しています…');
+
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setCameraStatus('このブラウザではカメラを利用できません。', true);
+      cameraButton.disabled = false;
+      return;
+    }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: false,
+        video: {
+          facingMode: { ideal: 'environment' },
+          height: { ideal: 720 },
+          width: { ideal: 1280 },
+        },
+      });
+
+      if (requestId !== cameraRequestId || cameraPanel.hidden) {
+        stream.getTracks().forEach((track) => track.stop());
+        return;
+      }
+
+      cameraStream = stream;
+      cameraVideo.srcObject = stream;
+      await cameraVideo.play();
+      cameraCaptureButton.disabled = false;
+      setCameraStatus('撮影できます。式を枠内に合わせてください。');
+    } catch (error) {
+      const message = error?.name === 'NotAllowedError'
+        ? 'カメラの使用を許可してください。'
+        : 'カメラを起動できませんでした。';
+      setCameraStatus(message, true);
+    } finally {
+      if (requestId === cameraRequestId) cameraButton.disabled = false;
+    }
   }
 
   function nearlyZero(value) {
@@ -760,6 +980,25 @@
       insertKey(button.dataset.key, { focus: false });
       expressionInput.blur();
     }
+  });
+
+  cameraButton.addEventListener('click', () => {
+    if (cameraPanel.hidden || !cameraStream) {
+      openCamera();
+    } else {
+      closeCamera();
+    }
+  });
+
+  cameraCloseButton.addEventListener('click', closeCamera);
+  cameraStopButton.addEventListener('click', closeCamera);
+  cameraCaptureButton.addEventListener('click', recognizeCameraExpression);
+
+  window.addEventListener('pagehide', () => {
+    closeCamera();
+    ocrWorker?.terminate();
+    ocrWorker = null;
+    ocrWorkerPromise = null;
   });
 
   document.addEventListener('keydown', (event) => {
