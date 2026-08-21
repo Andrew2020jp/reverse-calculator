@@ -7,8 +7,12 @@
 - `＋` `−` `×` `÷` `%` と括弧に対応
 - `□` `x` `X` `?` を未知数として利用可能
 - 小数・分数表示、計算ステップ、最近の計算履歴に対応
-- 依存パッケージなしで動作する HTML / CSS / JavaScript サイト
+- カメラのライブ映像から式を OCR 認識して自動計算
+- ビルドツール不要で動作する HTML / CSS / JavaScript サイト
 - GitHub Pages 用の自動デプロイ workflow 付き
+
+カメラ機能は HTTPS（または localhost）で開き、カメラの使用を許可すると利用できます。
+OCR ライブラリは「カメラで読み取る」を初めて使うときだけ CDN から読み込みます。写真はサーバーへ送信せず、ブラウザ内で処理します。
 
 ## Run locally
 
@@ -24,7 +28,4 @@ python -m http.server 8000
 
 `main` ブランチへ push すると、`.github/workflows/deploy-pages.yml` が GitHub Pages に公開します。
 リポジトリの Settings → Pages で、公開元に **GitHub Actions** を選択してください。
-
-## Website
-https://andrew2020jp.github.io/reverse-calculator/
 
