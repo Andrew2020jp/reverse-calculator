@@ -27,6 +27,7 @@
 html {
   min-width: 320px;
   background: var(--bg);
+  touch-action: manipulation;
 }
 
 body {
@@ -46,6 +47,7 @@ body {
 button,
 input {
   font: inherit;
+  touch-action: manipulation;
 }
 
 button {
