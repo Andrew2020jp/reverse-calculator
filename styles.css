@@ -388,8 +388,10 @@ button {
 
 .keypad {
   margin-top: 4px;
-  padding-top: 15px;
-  border-top: 1px solid var(--line);
+  padding: 15px 13px 13px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(8, 13, 28, 0.3);
 }
 
 .keypad-heading {
@@ -410,19 +412,20 @@ button {
 .keypad-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 6px;
+  gap: 8px;
   margin-top: 10px;
 }
 
 .keypad-key {
-  min-height: 34px;
+  min-height: 44px;
   padding: 4px 6px;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 11px;
   color: var(--muted-bright);
   background: rgba(35, 46, 75, 0.52);
   font-family: 'DM Mono', monospace;
-  font-size: 13px;
+  font-size: 16px;
+  font-weight: 500;
   transition: border-color 160ms ease, color 160ms ease, background 160ms ease, transform 160ms ease;
 }
 
@@ -442,27 +445,45 @@ button {
 .keypad-key--action {
   color: #aeb8cf;
   background: rgba(102, 115, 149, 0.16);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.keypad-key--clear {
+  border-color: rgba(255, 159, 159, 0.22);
+  color: var(--danger);
+  background: rgba(255, 159, 159, 0.08);
 }
 
 .keypad-key--operator {
   color: var(--violet);
   background: rgba(161, 154, 255, 0.1);
+  font-size: 18px;
+  font-weight: 600;
 }
 
 .keypad-key--unknown {
   border-color: rgba(140, 240, 210, 0.3);
   color: var(--accent);
   background: rgba(140, 240, 210, 0.09);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.keypad-key--equals {
+  border-color: rgba(140, 240, 210, 0.28);
+  color: var(--accent);
+  background: rgba(140, 240, 210, 0.08);
 }
 
 .keypad-key--submit {
   grid-column: span 2;
-  min-height: 38px;
+  min-height: 44px;
   border-color: transparent;
   color: var(--accent-ink);
   background: var(--accent);
   font-family: 'Noto Sans JP', sans-serif;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
 }
 
@@ -928,6 +949,10 @@ button {
     grid-template-columns: 1fr;
   }
 
+  .answer-card {
+    order: -1;
+  }
+
   .solver-card,
   .answer-card {
     min-height: auto;
@@ -993,7 +1018,7 @@ button {
   }
 
   .keypad-key {
-    min-height: 36px;
+    min-height: 48px;
   }
 
   .quick-examples {
