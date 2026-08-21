@@ -56,51 +56,8 @@
                 <p class="section-kicker">INPUT EQUATION</p>
                 <h2 id="solver-title">計算式を入力</h2>
               </div>
-              <div class="card-heading-actions">
-                <span class="keyboard-hint">Enter ↵</span>
-                <button
-                  class="camera-button"
-                  id="camera-button"
-                  type="button"
-                  aria-controls="camera-panel"
-                  aria-expanded="false"
-                >
-                  <span aria-hidden="true">▣</span>
-                  カメラ
-                </button>
-              </div>
+              <span class="keyboard-hint">Enter ↵</span>
             </div>
-
-            <section class="camera-panel" id="camera-panel" aria-labelledby="camera-title" hidden>
-              <div class="camera-panel-heading">
-                <div>
-                  <p class="section-kicker">LIVE CAMERA</p>
-                  <h3 id="camera-title">式をカメラで読み取る</h3>
-                </div>
-                <button class="camera-close" id="camera-close" type="button" aria-label="カメラを閉じる">
-                  ×
-                </button>
-              </div>
-              <div class="camera-view">
-                <video id="camera-video" playsinline autoplay muted></video>
-                <div class="camera-guide" aria-hidden="true">
-                  <span>式をここに</span>
-                </div>
-                <p class="camera-status" id="camera-status" role="status" aria-live="polite">
-                  カメラを起動しています…
-                </p>
-              </div>
-              <canvas id="camera-canvas" hidden></canvas>
-              <div class="camera-actions">
-                <button class="camera-capture" id="camera-capture" type="button" disabled>
-                  撮影して答えを出す
-                </button>
-                <button class="camera-stop" id="camera-stop" type="button">停止</button>
-              </div>
-              <p class="camera-help" id="camera-help">
-                式全体を明るく写してください。□・【】・x・? のどれか1つを含む式に対応します。
-              </p>
-            </section>
 
             <form id="solver-form" novalidate>
               <label class="input-label" for="expression">□ に入る数を求める式</label>
