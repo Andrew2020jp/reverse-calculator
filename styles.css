@@ -92,32 +92,32 @@ button {
 .brand {
   display: inline-flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   color: var(--text);
   text-decoration: none;
 }
 
 .brand-mark {
   display: grid;
-  width: 40px;
-  height: 40px;
+  width: 56px;
+  height: 56px;
   place-items: center;
   border: 1px solid rgba(140, 240, 210, 0.35);
-  border-radius: 12px;
+  border-radius: 16px;
   color: var(--accent);
   background: linear-gradient(145deg, rgba(140, 240, 210, 0.13), rgba(140, 240, 210, 0.025));
   box-shadow: 0 0 24px rgba(140, 240, 210, 0.07);
   font-family: 'DM Mono', monospace;
-  font-size: 13px;
+  font-size: 17px;
   line-height: 1;
 }
 
 .brand-mark span:first-child {
-  transform: translate(-5px, 4px);
+  transform: translate(-7px, 6px);
 }
 
 .brand-mark span:last-child {
-  transform: translate(5px, -4px);
+  transform: translate(7px, -6px);
 }
 
 .brand-copy {
@@ -126,7 +126,7 @@ button {
 }
 
 .brand-copy strong {
-  font-size: 14px;
+  font-size: 15px;
   letter-spacing: 0.04em;
 }
 

@@ -10,6 +10,10 @@
 - ビルドツール不要で動作する HTML / CSS / JavaScript サイト
 - GitHub Pages 用の自動デプロイ workflow 付き
 
+## Website
+
+公開版はこちら: [四則逆算電卓を開く](https://andrew2020jp.github.io/reverse-calculator/)
+
 ## Run locally
 
 ブラウザで `index.html` を開くだけで動作します。ローカルサーバーを使う場合は、次のように起動できます。
