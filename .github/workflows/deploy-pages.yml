@@ -25,6 +25,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      # GitHub Pages must be enabled with GitHub Actions in repository settings.
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
