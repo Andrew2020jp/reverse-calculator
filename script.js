@@ -18,7 +18,6 @@
   const stepsList = document.querySelector('#steps-list');
   const historyList = document.querySelector('#history-list');
 
-  const examples = document.querySelectorAll('.example-chip');
   const isTouchDevice =
     window.matchMedia?.('(pointer: coarse)').matches || Number(navigator.maxTouchPoints) > 0;
 
@@ -723,14 +722,6 @@
       // 保存領域が使えない環境では表示だけ更新します。
     }
     renderHistory();
-  });
-
-  examples.forEach((example) => {
-    example.addEventListener('click', () => {
-      expressionInput.value = example.dataset.expression || '';
-      expressionInput.focus();
-      form.requestSubmit();
-    });
   });
 
   keypad.addEventListener('click', (event) => {
