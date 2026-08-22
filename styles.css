@@ -516,49 +516,6 @@ button {
   outline: none;
 }
 
-.form-actions {
-  display: flex;
-  align-items: center;
-  gap: 17px;
-  margin-top: 31px;
-}
-
-.primary-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 27px;
-  min-width: 154px;
-  height: 48px;
-  padding: 0 16px 0 20px;
-  border: 0;
-  border-radius: 10px;
-  color: var(--accent-ink);
-  background: var(--accent);
-  box-shadow: 0 8px 25px rgba(99, 223, 189, 0.15);
-  font-size: 13px;
-  font-weight: 800;
-  transition: transform 160ms ease, background 160ms ease, box-shadow 160ms ease;
-}
-
-.primary-button:hover,
-.primary-button:focus-visible {
-  background: #a4f6df;
-  box-shadow: 0 10px 31px rgba(99, 223, 189, 0.25);
-  outline: none;
-  transform: translateY(-2px);
-}
-
-.primary-button:active {
-  transform: translateY(0);
-}
-
-.button-arrow {
-  font-size: 20px;
-  font-weight: 400;
-  line-height: 1;
-}
-
 .text-button,
 .clear-history {
   padding: 7px 0;
@@ -1017,10 +974,6 @@ button {
   .examples-label {
     width: 100%;
     margin-bottom: 1px;
-  }
-
-  .form-actions {
-    margin-top: 25px;
   }
 
   .supported-operators {
