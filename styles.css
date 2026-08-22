@@ -452,7 +452,7 @@ button {
 }
 
 .keypad-key[data-action='backspace'] {
-  font-size: 22px;
+  font-size: 28px;
   line-height: 1;
 }
 
