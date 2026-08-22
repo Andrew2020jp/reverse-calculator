@@ -6,7 +6,6 @@
 
   const form = document.querySelector('#solver-form');
   const expressionInput = document.querySelector('#expression');
-  const clearButton = document.querySelector('#clear-button');
   const clearHistoryButton = document.querySelector('#clear-history');
   const formError = document.querySelector('#form-error');
   const keypad = document.querySelector('#keypad');
@@ -713,12 +712,8 @@
     }
   });
 
-  clearButton.addEventListener('click', () => {
-    clearExpression();
-  });
-
   newExpressionButton.addEventListener('click', () => {
-    clearButton.click();
+    clearExpression();
   });
 
   clearHistoryButton.addEventListener('click', () => {
@@ -765,7 +760,7 @@
 
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
-      clearButton.click();
+      clearExpression();
     }
   });
 

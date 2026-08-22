@@ -329,36 +329,6 @@ button {
   pointer-events: none;
 }
 
-.clear-input-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  min-height: 48px;
-  margin-top: 10px;
-  padding: 0 16px;
-  border: 1px solid var(--line-bright);
-  border-radius: 10px;
-  color: var(--muted-bright);
-  background: rgba(35, 46, 75, 0.4);
-  font-size: 13px;
-  font-weight: 700;
-  transition: border-color 160ms ease, color 160ms ease, background 160ms ease, transform 160ms ease;
-}
-
-.clear-input-button:hover,
-.clear-input-button:focus-visible {
-  border-color: rgba(140, 240, 210, 0.52);
-  color: var(--accent);
-  background: rgba(140, 240, 210, 0.1);
-  outline: none;
-  transform: translateY(-1px);
-}
-
-.clear-input-button:active {
-  transform: translateY(1px);
-}
-
 .input-help {
   display: flex;
   align-items: center;
