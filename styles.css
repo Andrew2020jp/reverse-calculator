@@ -451,6 +451,11 @@ button {
   font-weight: 700;
 }
 
+.keypad-key[data-action='backspace'] {
+  font-size: 22px;
+  line-height: 1;
+}
+
 .keypad-key--clear {
   border-color: rgba(255, 159, 159, 0.22);
   color: var(--danger);
